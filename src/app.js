@@ -10,3 +10,4 @@ const vnode = createElement(
 );
 
 console.log(vnode);
+render(vnode, document.body);
