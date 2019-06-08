@@ -1,3 +1,6 @@
+import { assign } from "./util";
+import options from "./options";
+
 export function createElement(type, props, children) {
     // make shallow copy of props
     props = assign({}, props);
