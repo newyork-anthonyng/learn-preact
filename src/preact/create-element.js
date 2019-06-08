@@ -27,3 +27,32 @@ export function createElement(type, props, children) {
 
     return createVNode(type, props, key, ref);
 }
+
+export function createVNode(type, props, key, ref) {
+    const vnode = {
+        type,
+        props,
+        key,
+        ref,
+        _children: null,
+        _dom: null,
+        _lastDomChild: null,
+        _component: null,
+        constructor: undefined
+    };
+
+    // For hooks; vnode
+    if (options.vnode) {
+        options.vnode(vnode);
+    }
+
+    return vnode;
+}
+
+export function createRef() {
+    return {};
+}
+
+export function Fragment(props) {
+    return props.children;
+}
