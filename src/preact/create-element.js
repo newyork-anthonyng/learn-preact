@@ -13,6 +13,10 @@ export function createElement(type, props, children) {
         }
     }
 
+    if (children != null) {
+        props.children = children;
+    }
+
     // populate default props
     if (type !== null && type.defaultProps !== null) {
         for (let i in type.defaultProps) {
