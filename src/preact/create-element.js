@@ -56,3 +56,36 @@ export function createRef() {
 export function Fragment(props) {
     return props.children;
 }
+
+// Coerce an unstrusted value into a VNode
+export function coerceToVNode(possibleVNode) {
+    if (
+        possibleVNode == null ||
+        typeof possibleVNode === "boolean"
+    ) {
+        return null;
+    }
+
+    if (
+        typeof possibleVNode === "string" ||
+        typeof possibleVNode === "number"
+    ) {
+        return createVNode(null, possibleVNode, null, null);
+    }
+
+    // Clone vnode if it has already been used
+    if (
+        possibleVNode._dom != null ||
+        possibleVNode._component != null
+    ) {
+        const vnode = createVNode(
+            possibleVNode.type,
+            possibleVNode.props,
+            possibleVNode.key,
+            null
+        );
+        vnode._dom = possibleVNode._dom;
+        return vnode;
+    }
+    return possibleVNode;
+}
