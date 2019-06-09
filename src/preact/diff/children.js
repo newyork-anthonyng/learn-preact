@@ -132,7 +132,8 @@ export function diffChildren(
                     ) {
                         parentDom.appendChild(newDom);
                     } else {
-                        for (sibDom = oldDom, let j = 0; (sibDom = sibDom.nextSibling) && j < oldChildrenLength; j += 2) {
+                        let j;
+                        for (sibDom = oldDom, j = 0; (sibDom = sibDom.nextSibling) && j < oldChildrenLength; j += 2) {
                             if (sibDom == newDom) {
                                 break outer;
                             }
