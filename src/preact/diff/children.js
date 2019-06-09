@@ -1,6 +1,7 @@
 import { coerceToVNode } from "../create-element";
-import { diff } from "./index";
+import { diff, unmount, applyRef } from "./index";
 import { EMPTY_ARR, EMPTY_OBJ } from "../constants";
+import { removeNode } from "../util";
 
 /**
  * 
@@ -57,6 +58,9 @@ export function diffChildren(
     let childVNode;
     let oldVNode;
     let refs;
+    let firstChildDom;
+    let newDom;
+    let sibDom;
     // look tjhrough oldChildren for elements with the same key in newChildren
     // delete those elements from oldChildren
     for (let i = 0; i < newChildren.length; i++) {
@@ -90,7 +94,7 @@ export function diffChildren(
             oldVNode = oldVNode || EMPTY_OBJ;
 
             // Morph the old element
-            const newDom = diff(
+            newDom = diff(
                 parentDom,
                 childVNode,
                 oldVNode,
@@ -111,8 +115,63 @@ export function diffChildren(
             }
 
             if (newDom != null) {
+                if (firstChildDom == null) {
+                    firstChildDom = newDom;
+                }
 
+                if (childVNode._lastDomChild != null) {
+                    newDom = childVNode._lastDomChild;
+                } else if (
+                    excessDomChildren == oldVNode ||
+                    newDom != oldDom ||
+                    newDom.parentNode == null
+                ) {
+                    outer: if (
+                        oldDom == null ||
+                        oldDom.parentNode !== parentDom
+                    ) {
+                        parentDom.appendChild(newDom);
+                    } else {
+                        for (sibDom = oldDom, let j = 0; (sibDom = sibDom.nextSibling) && j < oldChildrenLength; j += 2) {
+                            if (sibDom == newDom) {
+                                break outer;
+                            }
+                        }
+                        parentDom.insertBefore(newDom, oldDom);
+                    }
+                }
+
+                oldDom = newDom.nextSibling;
+
+                if (typeof newParentVNode.type == "function") {
+                    newParentVNode._lastDomChild = newDom;
+                }
             }
+        }
+    }
+
+    newParentVNode._dom = firstChildDom;
+
+    if (
+        excessDomChildren != null &&
+        typeof newParentVNode.type !== "function"
+    ) {
+        for (let i = excessDomChildren.length; i--;) {
+            if (excessDomChildren[i] != null) {
+                removeNode(excessDomChildren[i]);
+            }
+        }
+    }
+
+    for (let i = oldChildrenLength; i--;) {
+        if (oldChildren[i] != null) {
+            unmount(oldChildren[i], ancestorComponent);
+        }
+    }
+
+    if (refs) {
+        for (let i = 0; i < refs.length; i++) {
+            applyRef(refs[i], refs[++i], ancestorComponent);
         }
     }
 };
