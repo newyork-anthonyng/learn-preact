@@ -343,3 +343,16 @@ function diffElementNodes(
         }
     }
 }
+
+export function commitRoot(mounts, root) {
+    let c;
+    while ((c = mounts.pop())) {
+        try {
+            c.componentDidMount();
+        } catch(e) {
+            catchErrorInComponent(e, c._vnode._parent);
+        }
+    }
+
+    if (options._commit) options._commit(root);
+}

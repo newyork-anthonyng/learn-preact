@@ -1,4 +1,5 @@
 import { EMPTY_OBJ, EMPTY_ARR } from "./constants";
+import { commitRoot } from "./diff/index";
 import { diffChildren } from "./diff/children";
 import options from "./options";
 import { Fragment, createElement } from "./create-element";
@@ -40,4 +41,5 @@ export function render(
         ancestorComponent,
         oldDom
     );
+    commitRoot(mounts, vnode);
 };
